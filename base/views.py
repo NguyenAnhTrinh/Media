@@ -1,14 +1,16 @@
+import os
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.http import HttpResponse
-from .models import Room, Topic, Message
+from .models import Room, Topic, Message,Profile
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from .forms import RoomForm, UserForm
+from .forms import RoomForm, UserForm ,ProfileForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login ,logout
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 
 
 
@@ -26,17 +28,21 @@ def home(request):
     room_count = rooms.count()
     room_message = Message.objects.filter(
         Q(room__topic__name__icontains =q))
+    # user = User.objects.get(id=request.user.id)
+    # user_profile = Profile.objects.get(user=user)
     context = {'rooms':rooms,'topic':topic, 
-               'room_count':room_count,'room_message':room_message}
+               'room_count':room_count,'room_message':room_message ,}
 
     return render(request,'base/home.html',context)
 
 def userProfile(request,pk):
     user = User.objects.get(id=pk)
+    user_profile = Profile.objects.get(user=user)
+    # img = user.profile.objects.proImg
     rooms = user.room_set.all()
     room_message = user.message_set.all()
     topics = Topic.objects.all()
-    context ={'user':user,'rooms':rooms,'room_message':room_message,'topics':topics}
+    context ={'user':user,'rooms':rooms,'room_message':room_message,'topics':topics,'user_profile':user_profile}
     return render(request,'base/profile.html',context)
 
 
@@ -59,6 +65,14 @@ def room(request,pk):
     context = {'rooms':room, 'message':messages, 'participants': pa}
     return render(request,'base/room.html',context)
 
+def get_rooms(request, offset):
+    # Lấy các phòng, ví dụ: 5 phòng mỗi lần tải
+    rooms = Room.objects.all()[offset:offset + 5]
+    data = {
+        'html': render(request, 'room_partial.html', {'rooms': rooms}).content.decode('utf-8'),
+        'has_more': len(rooms) == 5,  # Kiểm tra xem còn phòng để tải không
+    }
+    return JsonResponse(data)
 #can dang nhap moi dung dc
 @login_required(login_url='login')
 def createRoom(request):
@@ -107,7 +121,7 @@ def deleteRoom(request,pk):
     if request.method == 'POST':
         room.delete()
         return redirect('home')
-    return render(request,'base/room_form.html',{'obj':room})
+    return render(request,'base/delete.html',{'obj':room})
 
 def loginPage(request):
 
@@ -149,6 +163,9 @@ def sign(request):
             user.username = user.username.lower()
             user.save()
             login(request,user)
+
+            new_profile = Profile.objects.create(user=user)
+            new_profile.save()
             return redirect('home')
         else:
             messages.error(request,"sai")
@@ -180,3 +197,28 @@ def deleteMessage(request,pk):
         message.delete()
         return redirect('room',pk=message.room.id)
     return render(request,'base/delete.html',{'obj':message})
+
+
+
+
+#upload img
+@login_required(login_url='login')
+def update_avatar(request):
+    user = request.user
+
+    profile, created = Profile.objects.get_or_create(user=user)
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            # Save the form to update the profile image
+            form.save()
+            return redirect('profile', pk = user.id)  # Replace 'profile' with the actual URL name for the user's profile page
+    else:
+        form = ProfileForm(instance=profile)
+
+    context = {'form': form}
+    return render(request, 'base/upload_profile_image.html', context)
+
+
+

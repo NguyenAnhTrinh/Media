@@ -1,7 +1,20 @@
 {% extends 'main.html' %}
 
 {% block content %}
+<style>
+/* Thêm một số kiểu để áp dụng hiệu ứng zoom */
+.zoomable {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.zoomable.zoomed {
+    transform: scale(2); /* Điều chỉnh giá trị scale tùy thuộc vào mức độ zoom mong muốn */
+}
+
+</style>
 <main class="profile-page layout layout--3">
+
   <div class="container">
     <!-- Topics Start -->
     {% include 'base/topics_compo.html' %}
@@ -11,14 +24,18 @@
     <div class="roomList">
       <div class="profile">
         <div class="profile__avatar">
-          <div class="avatar avatar--large active">
-            <img src="{{user.avatar.url}}" />
-          </div>
+          <div class="image-container">
+            <div class="avatar avatar--large active zoomable" id="avatar-image">
+              <img src="{{ user_profile.proImg.url }}" alt="Profile Image">
+            </div>
+        </div>
         </div>
         <div class="profile__info">
           <h3>{{user.name}}</h3>
           <p>@{{user.username}}</p>
           {% if request.user == user %}
+          <a href="{%url 'update_avatar' %}" class="btn btn--main btn--pill">Avatar</a>
+
           <a href="{%url 'update-user'%}" class="btn btn--main btn--pill">Edit Profile</a>
           {% endif %}
         </div>
@@ -32,7 +49,7 @@
 
       <div class="roomList__header">
         <div>
-          <h2>Study Rooms Hosted by dennis_ivy</a>
+          <h2></a>
           </h2>
         </div>
       </div>
@@ -47,4 +64,21 @@
     <!-- Activities End -->
   </div>
 </main>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var avatarImage = document.getElementById('avatar-image');
+
+    // Khi người dùng nhấp vào hình ảnh
+    avatarImage.addEventListener('click', function () {
+        avatarImage.classList.toggle('zoomed');
+    });
+
+    // Khi người dùng nhấp vào nền để tắt zoom
+    document.addEventListener('click', function (event) {
+        if (!avatarImage.contains(event.target)) {
+            avatarImage.classList.remove('zoomed');
+        }
+    });
+});
+</script>
 {% endblock content %}

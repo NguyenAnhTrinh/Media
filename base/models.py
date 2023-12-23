@@ -2,6 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Profile(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE )
+    proImg = models.ImageField(upload_to='profile_images/',default='defaut1.png',null=True)
+
+    def __str__(seft):
+        return seft.user.username
+    
+
+
+
 class Topic(models.Model):
     name = models.CharField(max_length=200)
 
@@ -35,3 +45,7 @@ class Message(models.Model):
         ordering = ['-updated','created']
     def __str__(seft):
         return seft.body[0:50]
+    
+
+    
+    

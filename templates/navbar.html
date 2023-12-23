@@ -3,7 +3,7 @@
     <div class="container">
         <a href="{% url 'home' %}" class="header__logo">
             <img src="{%static 'images/logo.svg'%}" />
-            <h1>StudyBuddy</h1>
+            <h1>Social Media</h1>
         </a>
         <form class="header__search" method="GET" action="{%url 'home'%}">
             <label>
@@ -26,9 +26,9 @@
             <!-- Logged In -->
             {%if request.user.is_authenticated%}
             <div class="header__user">
-                <a href="profile.html">
+                <a href="{% url 'profile' user.id %}">
                     <div class="avatar avatar--medium active">
-                        <img src="https://randomuser.me/api/portraits/men/37.jpg" />
+                        <img src="{{ user_profile.proImg.url }}" />
                     </div>
                     <p>{{request.user}} <span>@{{request.user.username}}</span></p>
                 </a>

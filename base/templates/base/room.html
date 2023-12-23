@@ -60,7 +60,7 @@
             <p>Hosted By</p>
             <a href="{%url 'profile' rooms.host.id%}" class ="thread__author">
               <div class="avatar avatar--small">
-                <img src="{{room.host.avatar.url}}" />
+                <img src="{{ user_profile.proImg.url }}" />
               </div>
               <span>@{{rooms.host.username}}</span>
             </a>
