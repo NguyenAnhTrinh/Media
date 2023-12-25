@@ -1,4 +1,5 @@
 import os
+import random
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.http import HttpResponse
@@ -27,11 +28,11 @@ def home(request):
     
     room_count = rooms.count()
     room_message = Message.objects.filter(
-        Q(room__topic__name__icontains =q))
-    # user = User.objects.get(id=request.user.id)
-    # user_profile = Profile.objects.get(user=user)
+        Q(room__topic__name__icontains =q))[0:3]
+    all_users = User.objects.exclude(username = request.user.username)
+    random_users = random.sample(list(all_users), min(2, len(all_users)))
     context = {'rooms':rooms,'topic':topic, 
-               'room_count':room_count,'room_message':room_message ,}
+               'room_count':room_count,'room_message':room_message ,'random_users':random_users}
 
     return render(request,'base/home.html',context)
 
@@ -39,10 +40,12 @@ def userProfile(request,pk):
     user = User.objects.get(id=pk)
     # user_profile = Profile.objects.get(user=user)
     # img = user.profile.objects.proImg
+    all_users = User.objects.exclude(username = request.user.username)
+    random_users = random.sample(list(all_users), min(2, len(all_users)))
     rooms = user.room_set.all()
     room_message = user.message_set.all()
-    topics = Topic.objects.all()
-    context ={'user':user,'rooms':rooms,'room_message':room_message,'topics':topics}
+    topic = Topic.objects.all()[0:5]
+    context ={'user':user,'rooms':rooms,'room_message':room_message,'topic':topic ,'random_users':random_users}
     return render(request,'base/profile.html',context)
 
 
@@ -219,6 +222,11 @@ def topicsPage(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
     topics = Topic.objects.filter(name__icontains = q)
     return render(request,'base/topics.html',{'topics':topics})
+
+def friendPages(request):
+    current_user = request.user
+    user = User.objects.exclude(username=current_user.username)
+    return render(request,'base/allFriend.html',{'user':user})
 
 
 def activityPages(request):
