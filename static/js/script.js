@@ -67,3 +67,17 @@ if (photoInput)
 // Scroll to Bottom
 const conversationThread = document.querySelector(".room__box");
 if (conversationThread) conversationThread.scrollTop = conversationThread.scrollHeight;
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+  var threads = document.querySelectorAll('.thread');
+
+  threads.forEach(function(thread) {
+    if (thread.classList.contains('thread--user')) {
+      thread.style.justifyContent = 'flex-end'; // or any other styling for user's messages
+    } else {
+      thread.style.justifyContent = 'flex-start'; // or any other styling for other users' messages
+    }
+  });
+});

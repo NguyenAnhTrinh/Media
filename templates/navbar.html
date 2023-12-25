@@ -26,9 +26,9 @@
             <!-- Logged In -->
             {%if request.user.is_authenticated%}
             <div class="header__user">
-                <a href="{% url 'profile' user.id %}">
+                <a href="{% url 'profile' request.user.id %}">
                     <div class="avatar avatar--medium active">
-                        <img src="{{ user_profile.proImg.url }}" />
+                        <img src="{{ request.user.avatar.url }}" />
                     </div>
                     <p>{{request.user}} <span>@{{request.user.username}}</span></p>
                 </a>

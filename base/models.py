@@ -1,14 +1,15 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
+class User(AbstractUser):
+    name = models.CharField(max_length = 200, null = True)
+    email =models.EmailField(unique = True,null =True)
+    bio = models.TextField(null = True)
 
-class Profile(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE )
-    proImg = models.ImageField(upload_to='profile_images/',default='defaut1.png',null=True)
+    avatar = models.ImageField(default='defaut1.png',null=True)
 
-    def __str__(seft):
-        return seft.user.username
-    
+    USERNAME_FIELD ='email'
+    REQUIRED_FIELDS = []
 
 
 

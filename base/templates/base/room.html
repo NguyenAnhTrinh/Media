@@ -60,7 +60,7 @@
             <p>Hosted By</p>
             <a href="{%url 'profile' rooms.host.id%}" class ="thread__author">
               <div class="avatar avatar--small">
-                <img src="{{ user_profile.proImg.url }}" />
+                <img src="{{ rooms.host.avatar.url }}" />
               </div>
               <span>@{{rooms.host.username}}</span>
             </a>
@@ -118,14 +118,14 @@
     <div class="participants">
       <h3 class="participants__top">Participants <span>({{participants.count}} Joined)</span></h3>
       <div class="participants__list scroll">
-        {% for user in participants %}
-        <a href="{%  url 'profile' user.id %}" class="participant">
+        {% for p in participants %}
+        <a href="{%  url 'profile' p.id %}" class="participant">
           <div class="avatar avatar--medium">
-            <img src="{{user.avatar.url}}" />
+            <img src="{{p.avatar.url}}" />
           </div>
           <p>
-            {{user.name}}
-            <span>@{{user.username}}</span>
+            {{p.name}}
+            <span>@{{p.username}}</span>
           </p>
         </a>
         {% endfor %}
