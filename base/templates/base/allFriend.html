@@ -26,9 +26,9 @@
   {% extends 'main.html' %}
   
   {% block content %}
-  <main class="create-room layout">
-    <div class="container">
-      <div class="layout__box">
+  <main class="create-room layout" >
+    <div class="container" >
+      <div class="layout__box" >
         <div class="layout__boxHeader">
           <div class="layout__boxTitle">
             <a href="{% url 'home' %}">
@@ -39,7 +39,7 @@
                 </path>
               </svg>
             </a>
-            <h3>Browse Topics</h3>
+            <h3>New Friends</h3>
           </div>
         </div>
   
@@ -66,9 +66,13 @@
                     </div>
                     <div class="friend-info">
                       <span class="friend-name">{{ u.name }}</span>
-                      <div class="friend-actions">
-                        <button class="btn btn--primary">Add Friend</button>
+                      
+                      <div class="friend-actions" >
+                        <a href="">
+                        <button class="btn btn--primary" style="background-color: #99CCFF;">Add Friend</button>
+                      </a>
                       </div>
+                    
                     </div>
                   </div>
                 </a>

@@ -24,7 +24,7 @@ def home(request):
     rooms = Room.objects.filter(
         Q(topic__name__icontains =q) |
         Q(name__icontains = q)
-        )
+    )
     
     room_count = rooms.count()
     room_message = Message.objects.filter(
@@ -32,7 +32,7 @@ def home(request):
     all_users = User.objects.exclude(username = request.user.username)
     random_users = random.sample(list(all_users), min(2, len(all_users)))
     context = {'rooms':rooms,'topic':topic, 
-               'room_count':room_count,'room_message':room_message ,'random_users':random_users}
+               'room_count':room_count,'room_message':room_message ,'random_users':random_users,'users':all_users}
 
     return render(request,'base/home.html',context)
 
@@ -45,7 +45,7 @@ def userProfile(request,pk):
     rooms = user.room_set.all()
     room_message = user.message_set.all()
     topic = Topic.objects.all()[0:5]
-    context ={'user':user,'rooms':rooms,'room_message':room_message,'topic':topic ,'random_users':random_users}
+    context ={'user':user,'rooms':rooms,'room_message':room_message,'topic':topic ,'random_users':random_users ,'users':all_users}
     return render(request,'base/profile.html',context)
 
 
@@ -136,7 +136,7 @@ def loginPage(request):
         try:
             user = User.objects.get(username=username)
         except:
-            messages.error(request,'User dose not exit')
+            messages.error(request,'')
 
 
         user = authenticate(request,username = username,password = password)
