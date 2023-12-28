@@ -26,18 +26,20 @@
         <div class="profile__avatar">
           <div class="image-container">
             <div class="avatar avatar--large active zoomable" id="avatar-image">
-              <img src="{{ user.avatar.url }}" alt="Profile Image">
+              <img src="{{ user.avatar.url }}" alt="Profile Image" >
             </div>
         </div>
         </div>
         <div class="profile__info">
           <h3>{{user.name}}</h3>
-          <p>@{{user.username}}</p>
           {% if request.user == user %}
           <a href="{%url 'update_avatar' %}" class="btn btn--main btn--pill">Avatar</a>
 
           <a href="{%url 'update-user'%}" class="btn btn--main btn--pill">Edit Profile</a>
+          {%else%}
+          <a href="{%url 'update_avatar' %}" class="btn btn--main btn--pill">Add Friend</a>
           {% endif %}
+
         </div>
         <div class="profile__about">
           <h3>About</h3>

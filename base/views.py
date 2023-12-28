@@ -28,9 +28,9 @@ def home(request):
     
     room_count = rooms.count()
     room_message = Message.objects.filter(
-        Q(room__topic__name__icontains =q))[0:3]
-    all_users = User.objects.exclude(username = request.user.username)
-    random_users = random.sample(list(all_users), min(2, len(all_users)))
+        Q(room__topic__name__icontains =q))[0:5]
+    all_users = User.objects.exclude(username = request.user.username)[0:4]
+    random_users = random.sample(list(all_users), min(4, len(all_users)))
     context = {'rooms':rooms,'topic':topic, 
                'room_count':room_count,'room_message':room_message ,'random_users':random_users,'users':all_users}
 
@@ -40,10 +40,10 @@ def userProfile(request,pk):
     user = User.objects.get(id=pk)
     # user_profile = Profile.objects.get(user=user)
     # img = user.profile.objects.proImg
-    all_users = User.objects.exclude(username = request.user.username)
-    random_users = random.sample(list(all_users), min(2, len(all_users)))
+    all_users = User.objects.exclude(username = request.user.username)[0:4]
+    random_users = random.sample(list(all_users), min(5, len(all_users)))
     rooms = user.room_set.all()
-    room_message = user.message_set.all()
+    room_message = user.message_set.all()[0:5]
     topic = Topic.objects.all()[0:5]
     context ={'user':user,'rooms':rooms,'room_message':room_message,'topic':topic ,'random_users':random_users ,'users':all_users}
     return render(request,'base/profile.html',context)
@@ -90,7 +90,7 @@ def createRoom(request):
             topic = topic,
             name = request.POST.get('name'),
             description = request.POST.get('description'),
-            password = request.POST.get('password'),
+            # password = request.POST.get('password'),
         )
         return redirect('home')
     context = {'form':form,"topic":topic}
@@ -158,7 +158,7 @@ def logoutUser(request):
 def sign(request):
     page = 'sign'
     form = MyUserCreationForm()
-
+    
     if request.method == 'POST':
         form = MyUserCreationForm(request.POST)
         if form.is_valid():
@@ -224,10 +224,15 @@ def topicsPage(request):
     return render(request,'base/topics.html',{'topics':topics})
 
 def friendPages(request):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
     current_user = request.user
-    user = User.objects.exclude(username=current_user.username)
+    user = User.objects.filter(~Q(username=current_user.username), Q(username__icontains=q))
     return render(request,'base/allFriend.html',{'user':user})
 
+def myFriends(request):
+    current_user = request.user
+    user = User.objects.exclude(username=current_user.username)
+    return render(request,'base/myfriend.html',{'user':user})
 
 def activityPages(request):
     room_message = Message.objects.all()

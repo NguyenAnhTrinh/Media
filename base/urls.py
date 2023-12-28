@@ -17,6 +17,8 @@ urlpatterns = [
     path('update-user/',views.updateUser, name ="update-user"),
     path('topics/',views.topicsPage, name ="topics"),
     path('friend/',views.friendPages, name ="friend"),
+    path('myfriend/',views.myFriends, name ="myfriend"),
+
 
     path('activity/',views.activityPages, name ="activity"),
 

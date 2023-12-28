@@ -134,5 +134,32 @@
     <!--  End -->
   </div>
 </main>
-<script src="script.js"></script>
+<script>
+
+    // Connect to WebSocket
+    var roomName = "{{ room_id }}";
+    var socket = new WebSocket("ws://" + window.location.host + "/ws/room/" + roomName + "/");
+
+    socket.onopen = function (event) {
+        console.log('WebSocket connection opened:', event);
+    };
+
+    socket.onmessage = function (event) {
+        var data = JSON.parse(event.data);
+        // Handle received message, update your UI
+        console.log('WebSocket message received:', data);
+    };
+
+    socket.onclose = function (event) {
+        console.log('WebSocket connection closed:', event);
+    };
+
+    // Function to send a message via WebSocket
+    function sendMessage(message) {
+        socket.send(JSON.stringify({
+            'message': message
+        }));
+    }
+
+</script>
 {% endblock content %}

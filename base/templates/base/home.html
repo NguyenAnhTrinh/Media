@@ -1,7 +1,56 @@
 {%extends 'main.html'%}
 
 {% block content%}
+  <style>
+.create-room-form {
+  display: none;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.3s, transform 0.3s;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
 
+.create-room-form.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 5px;
+}
+
+input, textarea {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Thêm style cho nút "Post" */
+.btn--primary {
+  background-color: #007BFF;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn--primary:hover {
+  background-color: #0056b3;
+}
+
+/* ... (các styles khác) ... */
+
+  </style>
 <main class="layout layout--3">
   <div class="container">
     <!-- Topics Start -->
@@ -33,7 +82,7 @@
           <h2>Study Room</h2>
           <p>{{rooms.count}} Rooms available</p>
         </div>
-        <a class="btn btn--main" href="{%url 'create-room' %}">
+        <a class="btn btn--main" href="{% url 'create-room' %}" >
           <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
             <title>add</title>
             <path
@@ -43,6 +92,21 @@
           Create Room
         </a>
       </div>
+      <!-- create room form -->
+      <div id="createRoomForm" class="create-room-form"  >
+        <form action="{% url 'create-room' %}" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <label for="image">Choose an image:</label>
+          <input type="file" id="image" name="image" accept="image/*">
+          
+          <label for="caption">Caption:</label>
+          <textarea id="caption" name="caption" placeholder="Add a caption..."></textarea>
+          
+          <button type="submit" class="btn btn--primary" style="text-align: center;">Post</button>
+        </form>
+      </div>
+
+
         {%include 'base/feed.html'%}
     </div>
     <!-- Room List End -->
@@ -52,5 +116,13 @@
     <!-- Activities End -->
   </div>
 </main>
+<script>
+document.getElementById("createRoomBtn").addEventListener("click", function (event) {
+  event.preventDefault(); // Prevent the default behavior of the link
+  var createRoomForm = document.getElementById("createRoomForm");
+  createRoomForm.classList.toggle("show");
+});
+
+</script>
 
 {%endblock%}

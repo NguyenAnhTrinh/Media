@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -20,14 +21,15 @@ class Topic(models.Model):
         return seft.name
 # Create your models here.
 class Room(models.Model):
+    # id = models.UUIDField(primary_key= True, default =uuid.uuid4)
     host = models.ForeignKey(User,on_delete=models.SET_NULL,null =True)
     topic = models.ForeignKey(Topic,on_delete=models.SET_NULL,null=True)
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200,null =True)
+    img = models.ImageField(default='',null=True)
     description = models.TextField(null = True, blank = True)
     participants = models.ManyToManyField(User,related_name='participants',blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
-    password = models.TextField(null = True, blank = True)
     
 
     class Meta:
