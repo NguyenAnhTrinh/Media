@@ -26,4 +26,6 @@ urlpatterns = [
     path('update_avatar/', views.update_avatar, name='update_avatar'),
     # path('update_avatar/', views.update_avatar, name='update_avatar'),
 
+
+
 ]

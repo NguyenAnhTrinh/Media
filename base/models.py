@@ -51,4 +51,3 @@ class Message(models.Model):
     
 
     
-    

@@ -3,7 +3,7 @@ import random
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.http import HttpResponse
-from .models import Room, Topic, Message ,User
+from .models import Room, Topic, Message ,User 
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from .forms import RoomForm, UserForm ,ProfileForm ,MyUserCreationForm
@@ -237,3 +237,9 @@ def myFriends(request):
 def activityPages(request):
     room_message = Message.objects.all()
     return render(request,'base/activityvp.html',{})
+
+
+
+
+
+#chat with friend

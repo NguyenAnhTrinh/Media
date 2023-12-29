@@ -32,8 +32,9 @@
           
           <div class="form__group">
             <label for="profile_pic">{{field.label}}</label>
-            <img id="selectedImage" alt="Selected Image">
-            <input type="file" id="imageInput" accept="image/*">
+            <img id = "selectedImage" alt="selected Image">
+            <p id = "imageInput" accept = "image*/"> {{field}}</p>
+            
           </div>
           {% endfor %}
 
@@ -50,7 +51,7 @@
 </main>
 <script>
   // Lưu trữ đường dẫn của hình ảnh mặc định
-var defaultImageURL = "{{request.user.avatar.url}}";
+  var defaultImageURL = "{{request.user.avatar.url}}";
 
   // Lắng nghe sự kiện khi người dùng chọn hình ảnh
   document.getElementById('imageInput').addEventListener('change', function (event) {
