@@ -1,0 +1,29 @@
+
+  <div class="activities__content" id="requestList" style="display: none;">
+    <!-- Danh sách bạn bè sẽ được hiển thị ở đây -->
+    {% for u in sent %}
+    <div class="activities__box" style="margin-top: 5px;">
+      <div class="friend-item">
+        <div class="friend-request-item">
+          <div class="friend-request-avatar">
+            <div class=" friend-avatar">
+              <a href="{% url 'profile' u.sender.id%}"> <img src="{{ u.sender.avatar.url }}" alt="{{ u.name }} Avatar" /></a>
+            </div>
+            <div class="friend-info">
+              <a href="{% url 'profile' u.sender.id%}"><span class="friend-name">{{ u.sender.name }}</span>
+            </div>
+          <div class="friend-request-actions">
+            <a href="{% url 'accept' u.sender.id%}"><button class="btn btn--accept" style="background-color: #99CCFF;">Accept</button></a>
+            <a href="{% url 'reject' u.sender.id%}"><button class="btn btn--reject" style="background-color: #99CCFF;">Reject</button></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    <a class="btn btn--link" href="{%url 'myfriend'%}" style="float: right;">
+      More
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+        <title>chevron-down</title>
+        <path d="M16 21l-13-13h-3l16 16 16-16h-3l-13 13z"></path>
+      </svg>
+    </a>

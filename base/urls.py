@@ -24,7 +24,12 @@ urlpatterns = [
 
 
     path('update_avatar/', views.update_avatar, name='update_avatar'),
-    # path('update_avatar/', views.update_avatar, name='update_avatar'),
+
+    path('addFriend/<str:pk>/',views.sentRequest,name="addFriend"),
+    path('accept/<str:pk>/',views.acceptRequest,name = 'accept'),
+    path('reject/<str:pk>/',views.reject, name = 'reject'),
+
+    
 
 
 

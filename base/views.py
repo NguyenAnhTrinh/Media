@@ -3,7 +3,7 @@ import random
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.http import HttpResponse
-from .models import Room, Topic, Message ,User 
+from .models import Room, Topic, Message ,User , Friendship
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from .forms import RoomForm, UserForm ,ProfileForm ,MyUserCreationForm
@@ -25,14 +25,21 @@ def home(request):
         Q(topic__name__icontains =q) |
         Q(name__icontains = q)
     )
-    
+    sent = Friendship.objects.filter(receiver=request.user, status='pending')
     room_count = rooms.count()
     room_message = Message.objects.filter(
         Q(room__topic__name__icontains =q))[0:5]
-    all_users = User.objects.exclude(username = request.user.username)[0:4]
+    
+
+    accepted_friends = Friendship.objects.filter(Q(sender=request.user, status='accepted') | Q(receiver=request.user, status='accepted'))
+
+
+    all_users = User.objects.exclude(
+        Q(id=request.user.id) | Q(friendship_sent__receiver=request.user, friendship_sent__status='accepted') | Q(friendship_received__sender=request.user, friendship_received__status='accepted')
+    )
     random_users = random.sample(list(all_users), min(4, len(all_users)))
     context = {'rooms':rooms,'topic':topic, 
-               'room_count':room_count,'room_message':room_message ,'random_users':random_users,'users':all_users}
+               'room_count':room_count,'room_message':room_message ,'random_users':random_users,'users':accepted_friends,'sent':sent}
 
     return render(request,'base/home.html',context)
 
@@ -40,12 +47,16 @@ def userProfile(request,pk):
     user = User.objects.get(id=pk)
     # user_profile = Profile.objects.get(user=user)
     # img = user.profile.objects.proImg
-    all_users = User.objects.exclude(username = request.user.username)[0:4]
+    accepted_friends = Friendship.objects.filter(Q(sender=request.user, status='accepted') | Q(receiver=request.user, status='accepted'))
+
+    all_users = User.objects.exclude(
+        Q(id=request.user.id) | Q(friendship_sent__receiver=request.user, friendship_sent__status='accepted') | Q(friendship_received__sender=request.user, friendship_received__status='accepted')
+    )
     random_users = random.sample(list(all_users), min(5, len(all_users)))
     rooms = user.room_set.all()
     room_message = user.message_set.all()[0:5]
     topic = Topic.objects.all()[0:5]
-    context ={'user':user,'rooms':rooms,'room_message':room_message,'topic':topic ,'random_users':random_users ,'users':all_users}
+    context ={'user':user,'rooms':rooms,'room_message':room_message,'topic':topic ,'random_users':random_users ,'users':accepted_friends}
     return render(request,'base/profile.html',context)
 
 
@@ -152,7 +163,7 @@ def loginPage(request):
 
 def logoutUser(request):
     logout(request)
-    return redirect('home')
+    return redirect('login')
 
 
 def sign(request):
@@ -226,12 +237,23 @@ def topicsPage(request):
 def friendPages(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
     current_user = request.user
-    user = User.objects.filter(~Q(username=current_user.username), Q(username__icontains=q))
+    user = User.objects.exclude(
+    Q(id=current_user.id) | 
+    Q(friendship_sent__receiver=current_user, friendship_sent__status='accepted') | 
+    Q(friendship_received__sender=current_user, friendship_received__status='accepted') |
+    Q(friendship_sent__sender=current_user, friendship_sent__status='pending')
+).filter(username__icontains=q)
     return render(request,'base/allFriend.html',{'user':user})
 
 def myFriends(request):
+    q = request.GET.get('q', '')  # Use an empty string as default if 'q' is not present
     current_user = request.user
-    user = User.objects.exclude(username=current_user.username)
+
+    # Filter friends based on search query and friendship status
+    user = Friendship.objects.filter(
+        (Q(sender=current_user, status='accepted') | Q(receiver=current_user, status='accepted'))
+        & (Q(sender__username__icontains=q) | Q(receiver__username__icontains=q))
+    )
     return render(request,'base/myfriend.html',{'user':user})
 
 def activityPages(request):
@@ -242,4 +264,60 @@ def activityPages(request):
 
 
 
-#chat with friend
+#add friend
+def sentRequest(request,pk):
+    receiver = get_object_or_404(User, pk=pk)
+
+    # Check if there is any previous friendship request (including rejected ones)
+    previous_request = Friendship.objects.filter(sender=request.user, receiver=receiver).first()
+
+    if previous_request:
+        # If there is a previous request, resend it
+        previous_request.status = 'pending'
+        previous_request.save()
+        messages.success(request, 'Friend request resent successfully.')
+    else:
+        # If there is no previous request, create a new one
+        Friendship.objects.create(sender=request.user, receiver=receiver, status='pending')
+        messages.success(request, 'Friend request sent successfully.')
+
+    return redirect('profile', pk=pk)
+
+def acceptRequest(request,pk):
+    sender = User.objects.get(pk=pk)
+
+        # Check if there is a pending friend request
+    friendship_request = Friendship.objects.filter(sender=sender, receiver=request.user, status='pending').first()
+
+    if friendship_request:
+        friendship_request.status = 'accepted'
+        friendship_request.save()
+        messages.success(request, f'You are now friends with {sender.username}.')
+    else:
+        messages.warning(request, 'No pending friend request found.')
+
+    return redirect('profile', pk=pk)
+
+
+def reject(request, pk):
+    sender = get_object_or_404(User, pk=pk)
+
+    friendship_request = Friendship.objects.filter(
+        (Q(sender=sender, receiver=request.user) | Q(sender=request.user, receiver=sender)),
+        status__in=['pending', 'accepted']
+    ).first()
+
+    if friendship_request:
+        # If the status is 'accepted', update it to 'rejected'
+        if friendship_request.status == 'accepted':
+            friendship_request.status = 'rejected'
+            friendship_request.save()
+            messages.success(request, f'Friendship with {sender.username} rejected.')
+        # If the status is 'pending', delete the friend request
+        elif friendship_request.status == 'pending':
+            friendship_request.delete()
+            messages.success(request, f'Friend request from {sender.username} rejected.')
+    else:
+        messages.warning(request, 'No pending or accepted friend request found with this user.')
+
+    return redirect('profile', pk=pk)

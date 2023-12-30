@@ -65,13 +65,35 @@
           <div class="topics__grid">
             {% for u in user %}
               <div class="topics__item" style="padding-top: 10px;">
-                <a href="{% url 'profile' u.id%}">
+                {% if u.sender == request.user %}
+                <a href="{% url 'profile' u.receiver.id%}">
                   <div class="friend-item">
                     <div class="friend-avatar">
-                      <img src="{{ u.avatar.url }}" alt="{{ u.name }} Avatar"  />
+                      <img src="{{ u.receiver.avatar.url }}" alt="{{ u.name }} Avatar"  />
                     </div>
                     <div class="friend-info">
-                      <span class="friend-name">{{ u.name }}</span>
+                      <span class="friend-name">{{ u.receiver.name }}</span>
+                      
+                      <div class="friend-actions" style="display: flex;">
+                        <a href="{% url 'reject' u.receiver.id%}">
+                        <button class="btn btn--primary" style="background-color: #99CCFF;">Reject</button>
+                      </a>
+                      <a href="">
+                        <button class="btn btn--primary" style="background-color: #99CCFF;">Chat</button>
+                      </a>
+                      </div>
+                    
+                    </div>
+                  </div>
+                </a>
+                {%else%}
+                <a href="{% url 'profile' u.sender.id%}">
+                  <div class="friend-item">
+                    <div class="friend-avatar">
+                      <img src="{{ u.sender.avatar.url }}" alt="{{ u.name }} Avatar"  />
+                    </div>
+                    <div class="friend-info">
+                      <span class="friend-name">{{ u.sender.name }}</span>
                       
                       <div class="friend-actions" >
                         <a href="">
@@ -82,6 +104,8 @@
                     </div>
                   </div>
                 </a>
+                {%endif%}
+
               </div>
             {% endfor %}
           </div>

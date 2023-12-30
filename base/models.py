@@ -30,7 +30,6 @@ class Room(models.Model):
     participants = models.ManyToManyField(User,related_name='participants',blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
-    
 
     class Meta:
         ordering = ['-updated','created']
@@ -50,4 +49,14 @@ class Message(models.Model):
         return seft.body[0:50]
     
 
+
+
+#friend
+class Friendship(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendship_sent')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendship_received')
+    status = models.CharField(max_length=20, default='pending')  # 'pending', 'accepted', 'rejected'
+
+    def __str__(self):
+        return f"{self.sender.username} - {self.receiver.username} ({self.status})"
     

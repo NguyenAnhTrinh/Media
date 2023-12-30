@@ -37,7 +37,7 @@
 
           <a href="{%url 'update-user'%}" class="btn btn--main btn--pill">Edit Profile</a>
           {%else%}
-          <a href="{%url 'update_avatar' %}" class="btn btn--main btn--pill">Add Friend</a>
+          <a href="{%url 'addFriend' user.id %}" class="btn btn--main btn--pill">Add Friend</a>
           {% endif %}
 
         </div>
