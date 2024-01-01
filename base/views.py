@@ -20,6 +20,7 @@ from django.http import JsonResponse
 def home(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
     topic =Topic.objects.all()[0:5]
+    current_user = request.user
     #search
     rooms = Room.objects.filter(
         Q(topic__name__icontains =q) |
@@ -35,8 +36,18 @@ def home(request):
 
 
     all_users = User.objects.exclude(
-        Q(id=request.user.id) | Q(friendship_sent__receiver=request.user, friendship_sent__status='accepted') | Q(friendship_received__sender=request.user, friendship_received__status='accepted')
-    )
+        Q(id=current_user.id) |
+        Q(friendship_sent__receiver=current_user, friendship_sent__status='accepted') |
+        Q(friendship_received__sender=current_user, friendship_received__status='accepted') |
+        Q(friendship_sent__sender=current_user, friendship_sent__status='pending')
+    ).exclude(
+        Q(friendship_sent__receiver=current_user, friendship_sent__status='pending') |
+        Q(friendship_received__sender=current_user, friendship_received__status='pending')
+    ).exclude(
+        Q(friendship_sent__receiver=current_user, friendship_sent__status='accepted') |
+        Q(friendship_received__sender=current_user, friendship_received__status='accepted')
+    ).filter(username__icontains=q)
+    
     random_users = random.sample(list(all_users), min(4, len(all_users)))
     context = {'rooms':rooms,'topic':topic, 
                'room_count':room_count,'room_message':room_message ,'random_users':random_users,'users':accepted_friends,'sent':sent}
@@ -47,16 +58,37 @@ def userProfile(request,pk):
     user = User.objects.get(id=pk)
     # user_profile = Profile.objects.get(user=user)
     # img = user.profile.objects.proImg
+
+    friendship = Friendship.objects.filter(
+        Q(sender=request.user, receiver=user) | Q(sender=user, receiver=request.user)
+    ).first()
+    #hien thi cac request for addfr
+    sent = Friendship.objects.filter(receiver=request.user, status='pending')
+
+
+    #cac ban be trong trang thai da accepted
     accepted_friends = Friendship.objects.filter(Q(sender=request.user, status='accepted') | Q(receiver=request.user, status='accepted'))
 
+
+    #cac ban be thuoc chua request va da reject
     all_users = User.objects.exclude(
-        Q(id=request.user.id) | Q(friendship_sent__receiver=request.user, friendship_sent__status='accepted') | Q(friendship_received__sender=request.user, friendship_received__status='accepted')
+    Q(id=request.user.id) | 
+    Q(friendship_sent__receiver=request.user, friendship_sent__status='accepted') | 
+    Q(friendship_received__sender=request.user, friendship_received__status='accepted') | 
+    Q(friendship_sent__receiver=request.user, friendship_sent__status='rejected') | 
+    Q(friendship_received__sender=request.user, friendship_received__status='rejected')
     )
     random_users = random.sample(list(all_users), min(5, len(all_users)))
     rooms = user.room_set.all()
     room_message = user.message_set.all()[0:5]
     topic = Topic.objects.all()[0:5]
-    context ={'user':user,'rooms':rooms,'room_message':room_message,'topic':topic ,'random_users':random_users ,'users':accepted_friends}
+    context ={'user':user,'rooms':rooms,
+              'room_message':room_message,
+              'topic':topic ,
+              'random_users':random_users ,
+              'users':accepted_friends,
+              'sent':sent,
+              'friendship':friendship,}
     return render(request,'base/profile.html',context)
 
 
@@ -238,11 +270,19 @@ def friendPages(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
     current_user = request.user
     user = User.objects.exclude(
-    Q(id=current_user.id) | 
-    Q(friendship_sent__receiver=current_user, friendship_sent__status='accepted') | 
-    Q(friendship_received__sender=current_user, friendship_received__status='accepted') |
-    Q(friendship_sent__sender=current_user, friendship_sent__status='pending')
-).filter(username__icontains=q)
+        Q(id=current_user.id) |
+        Q(friendship_sent__receiver=current_user, friendship_sent__status='accepted') |
+        Q(friendship_received__sender=current_user, friendship_received__status='accepted') |
+        Q(friendship_sent__sender=current_user, friendship_sent__status='pending')
+    ).exclude(
+        Q(friendship_sent__receiver=current_user, friendship_sent__status='pending') |
+        Q(friendship_received__sender=current_user, friendship_received__status='pending')
+    ).exclude(
+        Q(friendship_sent__receiver=current_user, friendship_sent__status='accepted') |
+        Q(friendship_received__sender=current_user, friendship_received__status='accepted')
+    ).filter(username__icontains=q)
+    
+    
     return render(request,'base/allFriend.html',{'user':user})
 
 def myFriends(request):
