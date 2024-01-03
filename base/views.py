@@ -330,7 +330,7 @@ def acceptRequest(request,pk):
     sender = User.objects.get(pk=pk)
 
         # Check if there is a pending friend request
-    friendship_request = Friendship.objects.filter(sender=sender, receiver=request.user, status='pending').first()
+    friendship_request = Friendship.objects.filter(Q(sender=sender, receiver=request.user, status='pending')|Q(sender=request.user, receiver=sender, status='pending')).first()
 
     if friendship_request:
         friendship_request.status = 'accepted'
@@ -353,8 +353,7 @@ def reject(request, pk):
     if friendship_request:
         # If the status is 'accepted', update it to 'rejected'
         if friendship_request.status == 'accepted':
-            friendship_request.status = 'rejected'
-            friendship_request.save()
+            friendship_request.delete()
             messages.success(request, f'Friendship with {sender.username} rejected.')
         # If the status is 'pending', delete the friend request
         elif friendship_request.status == 'pending':

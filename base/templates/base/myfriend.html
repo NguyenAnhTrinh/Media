@@ -37,6 +37,7 @@
   .button-container {
     margin-top: 10px;
     
+    
   }
     
   </style>
@@ -86,9 +87,9 @@
                     <div class="friend-info">
                       <span class="friend-name">{{ u.receiver.name }}</span>
                       
-                      <div class="friend-actions" style="display: flex;">
-                        <a href="{% url 'reject' u.receiver.id%}">
-                        <button class="btn btn--primary" style="background-color: #99CCFF;">Reject</button>
+                      <div class="friend-actions" >
+                        <a href="{% url 'reject' u.receiver.id%}" >
+                        <button class="btn btn--primary" style="background-color: #99CCFF; ">Remove</button>
                       </a>
                       <a href="">
                         <button class="btn btn--primary" style="background-color: #99CCFF;">Chat</button>
@@ -108,8 +109,11 @@
                       <span class="friend-name">{{ u.sender.name }}</span>
                       
                       <div class="friend-actions" >
-                        <a href="">
-                        <button class="btn btn--primary" style="background-color: #99CCFF;">Add Friend</button>
+                        <a href="{% url 'reject' u.receiver.id%}" >
+                        <button class="btn btn--primary" style="background-color: #99CCFF; ">Remove</button>
+                      </a>
+                      <a href="">
+                        <button class="btn btn--primary" style="background-color: #99CCFF;">Chat</button>
                       </a>
                       </div>
                     
