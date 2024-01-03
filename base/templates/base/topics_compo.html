@@ -22,76 +22,8 @@
 
     <hr>
 
-
-    <style>
-      .topics__list {
-  list-style: none;
-  padding: 0;
-}
-
-.friend-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
-}
-
-.friend-avatar img {
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  margin-right: 10px;
-}
-
-.friend-info {
-  flex: 1;
-}
-
-.friend-name {
-  font-weight: bold;
-}
-
-.friend-actions button {
-  background-color: #4caf50;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-    </style>
-    <div class="topics__header">
-      <h2>Suggest</h2>
-    </div>
-    <ul class="topics__list">
-      {% for r in random_users %}
-      <li>
-        <a href="{% url 'profile' r.id %}">
-          <div class="friend-item">
-            <div class="friend-avatar">
-              <img src="{{ r.avatar.url }}" alt="{{ r.name }} Avatar" />
-            </div>
-            <div class="friend-info">
-              <span class="friend-name">{{ r.name }}</span>
-              <div class="friend-actions">
-                <button class="btn btn--primary">Add Friend</button>
-              </div>
-            </div>
-          </div>
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
-    <a class="btn btn--link" href="{%url 'friend'%}">
-      More
-      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-        <title>chevron-down</title>
-        <path d="M16 21l-13-13h-3l16 16 16-16h-3l-13 13z"></path>
-      </svg>
-    </a>
-    <hr>
+    {%include 'base/suggest.html' %}
+   
   </div>
 
 

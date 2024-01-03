@@ -267,23 +267,26 @@ def topicsPage(request):
     return render(request,'base/topics.html',{'topics':topics})
 
 def friendPages(request):
-    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    q = request.GET.get('q', '')
     current_user = request.user
-    user = User.objects.exclude(
-        Q(id=current_user.id) |
-        Q(friendship_sent__receiver=current_user, friendship_sent__status='accepted') |
-        Q(friendship_received__sender=current_user, friendship_received__status='accepted') |
-        Q(friendship_sent__sender=current_user, friendship_sent__status='pending')
-    ).exclude(
-        Q(friendship_sent__receiver=current_user, friendship_sent__status='pending') |
-        Q(friendship_received__sender=current_user, friendship_received__status='pending')
-    ).exclude(
-        Q(friendship_sent__receiver=current_user, friendship_sent__status='accepted') |
-        Q(friendship_received__sender=current_user, friendship_received__status='accepted')
-    ).filter(username__icontains=q)
-    
-    
-    return render(request,'base/allFriend.html',{'user':user})
+    users = User.objects.exclude(id=current_user.id).filter(username__icontains=q)
+
+    friendships_sent = Friendship.objects.filter(sender=current_user, status='pending')
+    sent_friend_requests = [friendship.receiver for friendship in friendships_sent]
+
+    friendships_received = Friendship.objects.filter(receiver=current_user, status='pending')
+    received_friend_requests = [friendship.sender for friendship in friendships_received]
+
+    friendships_accepted = Friendship.objects.filter(Q(sender=current_user, status='accepted') | Q(receiver=current_user, status='accepted'))
+    accepted_friends = [friendship.sender if friendship.receiver == current_user else friendship.receiver for friendship in friendships_accepted]
+
+    return render(request, 'base/allFriend.html', {
+        'users': users,
+        'current_user': current_user,
+        'sent_friend_requests': sent_friend_requests,
+        'received_friend_requests': received_friend_requests,
+        'accepted_friends': accepted_friends,
+    })
 
 def myFriends(request):
     q = request.GET.get('q', '')  # Use an empty string as default if 'q' is not present

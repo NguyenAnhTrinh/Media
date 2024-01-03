@@ -1,0 +1,73 @@
+<style>
+  .friend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+  }
+
+  .friend-avatar img {
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      margin-right: 10px;
+  }
+
+  .friend-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column; /* Stack name and actions vertically */
+  }
+
+  .friend-name {
+      font-weight: bold;
+      font-size: 16px; /* Adjust font size as needed */
+      margin-bottom: 5px; /* Add margin between name and actions */
+  }
+
+  .friend-actions button {
+      background-color: #1877f2; /* Facebook's primary color for buttons */
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+  }
+</style>
+
+<div class="topics__header">
+  <h2>Suggest</h2>
+</div>
+
+<ul class="topics__list">
+  {% for r in random_users %}
+  <li>
+      <div class="friend-item">
+          <div class="friend-avatar">
+              <img src="{{ r.avatar.url }}" alt="{{ r.name }} Avatar" />
+          </div>
+          <div class="friend-info">
+              <span class="friend-name">{{ r.name }}</span>
+              <div class="friend-actions">
+                  <!-- Use the anchor tag for the "Add Friend" button with a custom path -->
+                  <a href="{%url 'addFriend' r.id%}">
+                      <button class="btn btn--primary">Add Friend</button>
+                  </a>
+              </div>
+          </div>
+      </div>
+  </li>
+  {% endfor %}
+</ul>
+
+<a class="btn btn--link" href="{%url 'friend'%}">
+  More
+  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+      <title>chevron-down</title>
+      <path d="M16 21l-13-13h-3l16 16 16-16h-3l-13 13z"></path>
+  </svg>
+</a>
+
+<hr>

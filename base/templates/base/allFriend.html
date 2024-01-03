@@ -20,12 +20,23 @@
       border-radius: 8px;
       overflow: hidden;
       padding: 10px; /* Khoảng cách giữa nội dung trong khung */
+      height: 280px; 
     }
   
     .friend-avatar img {
       width: 150; /* Đảm bảo hình ảnh nằm đầy đủ trong khung */
       height: 150;
     }
+    .friend-actions {
+    display: flex;
+    flex-direction: column; /* Adjust to column direction */
+    align-items: center; /* Center the buttons horizontally */
+    margin-top: 10px;
+  }
+
+  .button-container {
+    margin-top: 10px;
+  }
     
   </style>
   
@@ -63,27 +74,43 @@
           </form>
   
           <div class="topics__grid">
-            {% for u in user %}
-              <div class="topics__item" style="padding-top: 10px;">
-                <a href="{% url 'profile' u.id%}">
-                  <div class="friend-item">
-                    <div class="friend-avatar">
-                      <img src="{{ u.avatar.url }}" alt="{{ u.name }} Avatar"  />
+            {% for u in users %}
+    <div class="topics__item" style="padding-top: 10px;">
+        <a href="{% url 'profile' u.id %}">
+            <div class="friend-item">
+                <div class="friend-avatar">
+                    <img src="{{ u.avatar.url }}" alt="{{ u.name }} Avatar" />
+                </div>
+                <div class="friend-info">
+                    <span class="friend-name">{{ u.name }}</span>
+                    <div class="friend-actions" style="gap: 1px;">
+                        {% if u in sent_friend_requests %}
+                            <!-- Người đang đăng nhập đã gửi yêu cầu kết bạn, hiển thị nút cancel -->
+                            <a href="{%url 'reject' u.id%}">
+                                <button class="btn btn--primary" style="background-color: #99CCFF; color: black; width: 10rem;">Cancel</button>
+                            </a>
+                        {% elif u in received_friend_requests %}
+                            <!-- Người đang đăng nhập nhận được yêu cầu kết bạn, hiển thị nút accept và reject -->
+                            <a href="{%url 'profile' u.id%}">
+                                <button class="btn btn--primary" style="background-color: #99CCFF; color: black; width: 10rem; margin-bottom: 1px;">See Profile</button>
+                            </a>
+                        {% elif u in accepted_friends %}
+                            <!-- Người đang đăng nhập đã kết bạn, hiển thị nút reject và chat -->
+                            <a href="{%url 'profile' u.id%}">
+                                <button class="btn btn--primary" style="background-color: #99CCFF; color: black;">See Profile</button>
+                            </a>
+                        {% else %}
+                            <!-- Người đang đăng nhập chưa có mối quan hệ với người này, hiển thị nút addfriend -->
+                            <a href="{% url 'addFriend' u.id %}">
+                                <button class="btn btn--primary" style="background-color: #99CCFF;">Add Friend</button>
+                            </a>
+                        {% endif %}
                     </div>
-                    <div class="friend-info">
-                      <span class="friend-name">{{ u.name }}</span>
-                      
-                      <div class="friend-actions" >
-                        <a href="{%url 'addFriend' u.id%}">
-                        <button class="btn btn--primary" style="background-color: #99CCFF;">Add Friend</button>
-                      </a>
-                      </div>
-                    
-                    </div>
-                  </div>
-                </a>
-              </div>
-            {% endfor %}
+                </div>
+            </div>
+        </a>
+    </div>
+{% endfor %}
           </div>
         </div>
       </div>
