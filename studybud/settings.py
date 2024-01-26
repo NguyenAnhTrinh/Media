@@ -66,7 +66,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    "corsheaders.middleware.CorsMiddleware"
+    "corsheaders.middleware.CorsMiddleware",
+    
+
+
 ]
 
 ROOT_URLCONF = 'studybud.urls'
@@ -90,6 +93,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'studybud.wsgi.application'
+ASGI_APPLICATION = 'studybud.asgi.application'
+ASGI_APPLICATION = 'studybud.routing.application'
+
+
+
+CHANNEL_LAYERS = {
+    'default':{
+        'BACKEND':'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 
 # Database

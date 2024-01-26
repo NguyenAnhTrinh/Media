@@ -1,40 +1,70 @@
 <style>
-  .friend-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-  }
+  .topics__list {
+  list-style-type: none;
+  padding: 0;
+}
 
-  .friend-avatar img {
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      object-fit: cover;
-      margin-right: 10px;
-  }
+.friend-item {
+  display: flex;
+  align-items: center;
+  border-radius: 10px; /* Bo góc */
+  margin-bottom: 10px; /* Khoảng cách giữa các item */
+  padding: 10px; /* Đệm cho từng item */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Đổ bóng cho item */
+}
 
-  .friend-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column; /* Stack name and actions vertically */
-  }
+.friend-avatar img {
+  border-radius: 50%; /* Làm cho avatar tròn */
+  width: 50px; /* Kích thước avatar */
+  height: 50px;
+  margin-right: 10px; /* Khoảng cách từ avatar đến thông tin */
+}
 
-  .friend-name {
-      font-weight: bold;
-      font-size: 16px; /* Adjust font size as needed */
-      margin-bottom: 5px; /* Add margin between name and actions */
-  }
+.friend-info {
+  flex-grow: 1;
+}
 
-  .friend-actions button {
-      background-color: #1877f2; /* Facebook's primary color for buttons */
-      color: #fff;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
-      border-radius: 4px;
-  }
+.friend-name {
+  font-weight: bold;
+  display: block;
+}
+
+.friend-mutual {
+  color: #808080; /* Màu chữ cho bạn chung */
+  font-size: 0.8rem; /* Kích thước font cho bạn chung */
+  margin-bottom: 5px; /* Khoảng cách giữa tên và bạn chung */
+}
+
+.friend-actions .btn {
+  text-decoration: none;
+  color: white;
+  padding: 5px 15px;
+  border: none;
+  border-radius: 5px; /* Bo góc cho nút */
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.btn--add {
+  background-color: #007bff; /* Màu nền cho nút Thêm bạn bè */
+  margin-right: 5px; /* Khoảng cách giữa các nút */
+}
+
+.btn--remove {
+  background-color: #dc3545; /* Màu nền cho nút Xóa */
+}
+
+.btn--link {
+  display: inline-block;
+  color: #007bff;
+  text-decoration: none;
+  padding: 5px 0;
+}
+
+.btn--link svg {
+  fill: #007bff;
+  margin-left: 5px;
+}
 </style>
 
 <div class="topics__header">
@@ -46,10 +76,10 @@
   <li>
       <div class="friend-item">
           <div class="friend-avatar">
-              <img src="{{ r.avatar.url }}" alt="{{ r.name }} Avatar" />
+              <a href="{%url 'profile' r.id%}"><img src="{{ r.avatar.url }}" alt="{{ r.name }} Avatar" /></a>
           </div>
           <div class="friend-info">
-              <span class="friend-name">{{ r.name }}</span>
+                <span class="friend-name">{{ r.name }}</span>
               <div class="friend-actions">
                   <!-- Use the anchor tag for the "Add Friend" button with a custom path -->
                   <a href="{%url 'addFriend' r.id%}">
@@ -70,4 +100,3 @@
   </svg>
 </a>
 
-<hr>

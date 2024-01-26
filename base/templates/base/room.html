@@ -1,5 +1,5 @@
 {% extends 'main.html' %}
-
+{% load static %}
 {% block content %}
 <main class="profile-page layout layout--2">
   <div class="container">
@@ -68,8 +68,8 @@
           <span class="room__topics">{{rooms.topic}}</span>
         </div>
 
-        <div class="room__conversation">
-          <div class="threads scroll">
+        <div class="room__conversation" >
+          <div class="threads scroll" id ="chat-messages">
             {% for message in message %}
             <div class="thread">
               <div class="thread__top">
@@ -97,7 +97,10 @@
                 {% endif %}
               </div>
               <div class="thread__details">
+
                 {{message.body}}
+
+                
               </div>
             </div>
             {% endfor %}
@@ -108,7 +111,9 @@
       <div class="room__message">
         <form action="" method="POST">
           {% csrf_token %}
-          <input name="body" placeholder="Write your message here..." />
+          <input name="body" id = "message-input" placeholder="Write your message here..." />
+          <button type="submit" id = "message-submit" hidden>submib
+          </button>
         </form>
       </div>
     </div>
@@ -133,33 +138,163 @@
     </div>
     <!--  End -->
   </div>
-</main>
+<!-- 
+  {%block scripts %}
+{{ rooms.id|json_script:"json_roomid" }}
+
+{{ request.user.username|json_script:"json_username"}}
+
 <script>
+  console.log('WebSocket connection established successfully.');
 
-    // Connect to WebSocket
-    var roomName = "{{ room_id }}";
-    var socket = new WebSocket("ws://" + window.location.host + "/ws/room/" + roomName + "/");
+  const roomId = JSON.parse(document.getElementById('json_roomid').textContent);
 
-    socket.onopen = function (event) {
-        console.log('WebSocket connection opened:', event);
-    };
+  const userName = JSON.parse(document.getElementById('json_username').textContent);
+  console.log('Room ID:', roomId);
+  console.log('Window Location Host:', window.location.host);
+  console.log(userName)
 
-    socket.onmessage = function (event) {
-        var data = JSON.parse(event.data);
-        // Handle received message, update your UI
-        console.log('WebSocket message received:', data);
-    };
+  // Connect to WebSocket
+  
+  const socketPath = window.location.protocol === 'https:' ? 'wss' : 'ws';
+const socketUrl = `${socketPath}://${window.location.host}/ws/room/${roomId}/`;
+const MessagesSocket = new WebSocket(socketUrl)
 
-    socket.onclose = function (event) {
-        console.log('WebSocket connection closed:', event);
-    };
 
-    // Function to send a message via WebSocket
-    function sendMessage(message) {
-        socket.send(JSON.stringify({
-            'message': message
-        }));
+  MessagesSocket.onmessage = function (e) {
+    console.log('onmessage');
+    const data = JSON.parse(e.data);
+
+    if (data.message) {
+        const message = data.message;
+
+        // Tạo phần tử div cho mỗi tin nhắn
+        const thread = document.createElement('div');
+        thread.classList.add('thread');
+
+        // Tạo phần tử div cho phần đầu tin nhắn
+        const threadTop = document.createElement('div');
+        threadTop.classList.add('thread__top');
+
+        // Tạo phần tử div cho thông tin tác giả
+        const threadAuthor = document.createElement('div');
+        threadAuthor.classList.add('thread__author');
+
+        // Tạo phần tử a cho đường dẫn tới trang cá nhân của tác giả
+        const authorLink = document.createElement('a');
+        authorLink.href = '';  // Cần cung cấp đường dẫn tới trang cá nhân của tác giả
+        authorLink.classList.add('thread__authorInfo');
+
+        // Tạo phần tử div cho avatar của tác giả
+        const authorAvatar = document.createElement('div');
+        authorAvatar.classList.add('avatar', 'avatar--small');
+
+        // Tạo phần tử img cho hình ảnh avatar của tác giả
+        const avatarImage = document.createElement('img');
+        avatarImage.src = message.user.avatar.url;  // Cần cung cấp đường dẫn hình ảnh avatar
+        authorAvatar.appendChild(avatarImage);
+
+        // Tạo phần tử span cho tên tác giả
+        const authorName = document.createElement('span');
+        authorName.innerText = '@' + message.user.username;
+
+        // Gắn các phần tử con vào phần tử cha của thông tin tác giả
+        authorLink.appendChild(authorAvatar);
+        authorLink.appendChild(authorName);
+        threadAuthor.appendChild(authorLink);
+
+        // Tạo phần tử span cho thời gian gửi tin nhắn
+        const threadDate = document.createElement('span');
+        threadDate.classList.add('thread__date');
+        threadDate.innerText = message.created;  // Cần cung cấp thông tin thời gian
+
+        // Gắn các phần tử con vào phần tử cha của phần đầu tin nhắn
+        threadTop.appendChild(threadAuthor);
+        threadTop.appendChild(threadDate);
+
+        // Tạo phần tử div cho nút xóa tin nhắn (nếu là tác giả của tin nhắn)
+        if (message.user.id == message.user.id) {
+            const deleteButton = document.createElement('div');
+            deleteButton.classList.add('thread__delete');
+
+            // Tạo phần tử a cho đường dẫn xóa tin nhắn
+            const deleteLink = document.createElement('a');
+            deleteLink.href = '';  // Cần cung cấp đường dẫn xóa tin nhắn
+
+            // Tạo phần tử svg cho biểu tượng xóa
+            const deleteIcon = document.createElement('svg');
+            deleteIcon.version = '1.1';
+            deleteIcon.xmlns = 'http://www.w3.org/2000/svg';
+            deleteIcon.width = '32';
+            deleteIcon.height = '32';
+            deleteIcon.viewBox = '0 0 32 32';
+
+            const deletePath = document.createElement('path');
+            deletePath.d = 'M27.314 6.019l-1.333-1.333-9.98 9.981-9.981-9.981-1.333 1.333 9.981 9.981-9.981 9.98 1.333 1.333 9.981-9.98 9.98 9.98 1.333-1.333-9.98-9.98 9.98-9.981z';
+
+            // Gắn các phần tử con vào phần tử cha của nút xóa tin nhắn
+            deleteIcon.appendChild(deletePath);
+            deleteLink.appendChild(deleteIcon);
+            deleteButton.appendChild(deleteLink);
+
+            // Gắn phần tử nút xóa vào phần đầu tin nhắn
+            threadTop.appendChild(deleteButton);
+        }
+
+        // Tạo phần tử div cho nội dung chi tiết của tin nhắn
+        const threadDetails = document.createElement('div');
+        threadDetails.classList.add('thread__details');
+        threadDetails.innerText = message.body;
+
+        // Gắn các phần tử con vào phần tử cha chính của tin nhắn
+        thread.appendChild(threadTop);
+        thread.appendChild(threadDetails);
+
+        // Gắn tin nhắn vào danh sách tin nhắn
+        document.querySelector('.threads').appendChild(thread);
+
+        scrollToBottom();
+    } else {
+        alert('The message was empty');
     }
+  }
 
-</script>
+
+
+  MessagesSocket.onclose = function (event) {
+    console.log('WebSocket connection closed:', event);
+};
+
+// Additional code for sending messages through the WebSocket
+document.querySelector('#message-submit').onclick = function (event) {
+    event.preventDefault();
+    
+    const messageInputDom = document.querySelector('#message-input');
+    const message = messageInputDom.value;
+
+    MessagesSocket.send(JSON.stringify({
+        'message': message,
+        'username': userName,
+        'room': roomId,
+    }));
+
+    messageInputDom.value = '';
+    return false;
+};
+
+  function scrollToBottom() {
+    const objdiv = document.querySelector('#chat-message');
+    objdiv.scrollTop = objdiv.scrollHeight
+  }
+
+  scrollToBottom();
+
+</script> -->
+{% endblock %}
+</main>
+
 {% endblock content %}
+
+
+
+

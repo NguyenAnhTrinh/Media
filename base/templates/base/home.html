@@ -79,7 +79,7 @@ input, textarea {
       </div>
       <div class="roomList__header">
         <div>
-          <h2>Study Room</h2>
+          <h2>News feed</h2>
           <p>{{rooms.count}} Rooms available</p>
         </div>
         <a class="btn btn--main" href="{% url 'create-room' %}" >
@@ -116,13 +116,9 @@ input, textarea {
     <!-- Activities End -->
   </div>
 </main>
-<script>
-document.getElementById("createRoomBtn").addEventListener("click", function (event) {
-  event.preventDefault(); // Prevent the default behavior of the link
-  var createRoomForm = document.getElementById("createRoomForm");
-  createRoomForm.classList.toggle("show");
-});
 
-</script>
 
+{%endblock%}
+
+{%block scripts%}
 {%endblock%}

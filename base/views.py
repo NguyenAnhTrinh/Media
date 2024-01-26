@@ -3,7 +3,7 @@ import random
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.http import HttpResponse
-from .models import Room, Topic, Message ,User , Friendship
+from .models import Room, Topic, Message ,User , Friendship ,Chat
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from .forms import RoomForm, UserForm ,ProfileForm ,MyUserCreationForm
@@ -363,3 +363,35 @@ def reject(request, pk):
         messages.warning(request, 'No pending or accepted friend request found with this user.')
 
     return redirect('profile', pk=pk)
+
+
+
+@login_required
+def open_chat(request, pk):
+    friend = User.objects.get(id=pk)
+    messages = Chat.objects.filter(
+        (Q(sender=request.user, receiver=friend) | Q(sender=friend, receiver=request.user))
+    )
+    if request.method == 'POST':
+        chat = Chat.objects.create(
+            sender = request.user,
+            receiver = friend,
+            content =request.POST.get('body'),
+        )
+        # room.participants.add(request.user)
+        return redirect('open_chat',pk=pk)
+    return render(request, 'base/chat.html', {'friend': friend, 'messages': messages})
+
+def delete_message_chat(request, message_id):
+    message = get_object_or_404(Chat, id=message_id)
+
+    # Check if the user has permission to delete the message
+    if request.user == message.sender:
+        message.delete()
+        messages.success(request, 'Message deleted successfully.')
+    else:
+        messages.error(request, 'You do not have permission to delete this message.')
+
+    # Redirect back to the chat room or any other appropriate page
+    return redirect('open_chat', pk=message.receiver.id)
+

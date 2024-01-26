@@ -1,15 +1,176 @@
-{% extends 'base.html' %}
+<!-- chat/open_chat.html -->
+
+{% extends 'main.html' %}
 
 {% block content %}
-  <h2>Chat with {{ friend.username }}</h2>
-  <div id="message-container">
-    {% for message in messages %}
-      <p>{{ message.sender.username }}: {{ message.content }}</p>
-    {% endfor %}
-  </div>
-  <form method="post" action="{% url 'send_message' friend.id %}">
-    {% csrf_token %}
-    <input type="text" name="content" required>
-    <button type="submit">Send</button>
-  </form>
+<style>
+  /* CSS cho giao diện chat */
+/* CSS cho giao diện chat */
+/* CSS cho giao diện chat */
+.room__conversation {
+  background-color: #1a1a1a; /* Màu nền tối */
+}
+
+.thread {
+  margin-bottom: 16px; /* Khoảng cách giữa các tin nhắn */
+}
+
+.thread__authorInfo {
+  color: #ffffff; /* Màu chữ cho thông tin người gửi */
+  display: flex;
+  justify-content: flex-end; /* Đặt thông tin người gửi về phía bên phải */
+}
+
+.thread__date {
+  color: #aaaaaa; /* Màu chữ cho thời gian gửi */
+}
+
+.sender-message {
+  background-color: #333333; /* Màu nền cho tin nhắn của người gửi */
+  color: #ffffff; /* Màu chữ cho tin nhắn của người gửi */
+  border-radius: 8px; /* Bo góc cho khung tin nhắn */
+  padding: 8px; /* Khoảng cách từ chữ đến viền khung */
+  text-align: right; /* Đặt tin nhắn về phía bên phải */
+}
+
+.receiver-message {
+  background-color: #4d4d4d; /* Màu nền cho tin nhắn của người nhận */
+  color: #ffffff; /* Màu chữ cho tin nhắn của người nhận */
+  border-radius: 8px; /* Bo góc cho khung tin nhắn */
+  padding: 8px; /* Khoảng cách từ chữ đến viền khung */
+}
+
+
+
+</style>
+<main class="profile-page layout layout--2">
+  <div class="container">
+    <!-- Room Start -->
+    <div class="room">
+      <div class="room__top">
+        <div class="room__topLeft">
+          <a href="{% url 'home' %}">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+              <title>arrow-left</title>
+              <path
+                d="M13.723 2.286l-13.723 13.714 13.719 13.714 1.616-1.611-10.96-10.96h27.625v-2.286h-27.625l10.965-10.965-1.616-1.607z">
+              </path>
+            </svg>
+          </a>
+          <h3>Room Chat</h3>
+        </div>
+
+      </div>
+      <div class="room__box scroll">
+        <div class="room__header scroll">
+          <div class="room__hosted">
+            <a href="{% url 'profile' friend.id%}" class ="thread__author">
+              <div class="avatar avatar--small">
+                <img src="{{friend.avatar.url}}">
+              </div>
+              <span>@{{friend.username}}</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="room__conversation" id ="chat-messages">
+          <div class="threads scroll">
+            {% for message in messages %}
+            <div class="thread">
+              <div class="thread__top">
+                {% if request.user == message.sender %}
+                <a href="{%url 'delete_message_chat' message.id%}">
+                  <div class="thread__delete">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                      <title>remove</title>
+                      <path
+                        d="M27.314 6.019l-1.333-1.333-9.98 9.981-9.981-9.981-1.333 1.333 9.981 9.981-9.981 9.98 1.333 1.333 9.981-9.98 9.98 9.98 1.333-1.333-9.98-9.98 9.98-9.981z">
+                      </path>
+                    </svg>
+                  </div>
+                </a>
+                {% endif %}
+                {% if request.user == message.sender %}
+                <div class="thread__author" style=" flex-direction: row-reverse;">
+                  
+                  <a href="{% url 'profile' message.sender.id%}" class="thread__authorInfo">
+                    <span>@{{message.sender.username}}</span>
+                    <div class="avatar avatar--small">
+                      <img src="{{message.sender.avatar.url}}" />
+                    </div>
+                    
+                  </a>
+                  <span class="thread__date">{{message.timestamp|timesince}} ago</span>
+                </div>
+                {%else%}
+                <div class="thread__author">
+                  <a href=" {% url 'profile' message.sender.id%}" class="thread__authorInfo">
+                    <div class="avatar avatar--small">
+                      <img src="{{message.sender.avatar.url}}" />
+                    </div>
+                    <span>@{{message.sender.username}}</span>
+                  </a>
+                  <span class="thread__date">{{message.timestamp|timesince}} ago</span>
+                </div>
+                {% endif %}
+              </div>
+              <div class="thread__details">
+                {% if request.user == message.sender %}
+                <div class="sender-message">
+                  {{message.content}}
+                </div>
+                {% else %}
+                <div class="receiver-message">
+                  {{message.content}}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        
+        
+        
+
+      </div>
+      <div class="room__message">
+        <form action="" method="POST">
+          {% csrf_token %}
+          <input name="body" id = "message-input" placeholder="Write your message here..." />
+          <button type="submit" id = "message-submit" hidden>submit
+          </button>
+        </form>
+      </div>
+    </div>
+<!-- Thêm vào cuối file HTML của bạn -->
+<!-- <script>
+  const urlPath = window.location.pathname;
+    const chatId = urlPath.split('/')[2]; // Lấy ID phòng chat từ URL
+
+    const chatSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/open_chat/' + chatId + '/'
+    );
+
+  chatSocket.onmessage = function(e) {
+    console.log("succc");
+      const data = JSON.parse(e.data);
+      document.querySelector('#chat-messages').innerHTML += ('<p>' + data.message + '</p>');
+  };
+
+  chatSocket.onclose = function(e) {
+      console.error('Chat socket closed unexpectedly');
+  };
+
+  document.querySelector('#your-chat-form').onsubmit = function(e) {
+      e.preventDefault();
+      const messageInputDom = document.querySelector('#your-message-input');
+      const message = messageInputDom.value;
+      chatSocket.send(JSON.stringify({
+          'message': message
+      }));
+      messageInputDom.value = '';
+  };
+</script> -->
+
 {% endblock %}
