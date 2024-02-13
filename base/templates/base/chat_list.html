@@ -1,170 +1,128 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <title>Chat Interface</title>
-</head>
+
 <style>
-  body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-  }
 
-  .container {
-    display: flex;
+
+  .sidebar {
+    width: 320px;
+    background-color: #333;
+    color: white;
     height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
   }
-
-  .friends-list, .chat-interface {
-    width: 300px;
-    height: 100%;
-    border: 1px solid #ccc;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-  }
-
-  .friends-list {
-    background-color: #fff;
-    padding: 10px;
-  }
-
-  .friends-list h2 {
-    text-align: center;
-  }
-
-  .friends-list ul {
-    list-style-type: none;
-    padding: 0;
-  }
-
-  .friends-list li {
-    padding: 10px;
-    cursor: pointer;
-  }
-
-  .friends-list li:hover {
-    background-color: #eee;
-  }
-
-  .chat-interface {
-    display: none;
-    flex-direction: column;
+  
+  .search input[type="search"] {
     width: 100%;
-  }
-
-  .chat-header {
-    background-color: #007bff;
-    color: #fff;
     padding: 10px;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .chat-messages {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 10px;
-  }
-
-  .chat-bubble {
-    max-width: 80%;
-    border-radius: 10px;
-    padding: 8px;
-    margin-bottom: 8px;
-  }
-
-  .chat-bubble.sender {
-    align-self: flex-end;
-    background-color: #007bff;
-    color: #fff;
-  }
-
-  .chat-bubble.receiver {
-    align-self: flex-start;
-    background-color: #ddd;
-    color: #000;
-  }
-
-  .chat-input {
-    display: flex;
-    padding: 10px;
-  }
-
-  .chat-input input {
-    flex-grow: 1;
-    margin-right: 10px;
-  }
-
-  .chat-input button {
-    background-color: #007bff;
-    color: #fff;
+    margin-bottom: 20px;
     border: none;
-    padding: 5px 10px;
-    cursor: pointer;
+    border-radius: 20px;
   }
-</style>
-<body>
-  <div class="container">
-    <div class="friends-list">
-      <h2>Friends</h2>
-      <ul>
-        {%for f in friend%}
-        <li onclick="openChat('{{f.receiver.name}}')">{{f.receiver.name}}</li>
-        {%endfor%}
-       
-      </ul>
-    </div>
+  
+  .menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .menu-item {
+  border-radius: 5px;
+  display: flex; /* Sử dụng Flexbox */
+  align-items: center; /* Căn chỉnh các items theo trục dọc giữa */
+  text-decoration: none; /* Loại bỏ gạch chân của liên kết */
+  color: inherit; /* Kế thừa màu chữ từ phần tử cha */
+  padding: 10px; /* Thêm một chút đệm */
+}
 
-    <div class="chat-interface" id="chatInterface">
-      <div class="chat-header">
-        <span id="chatTitle">Chat</span>
-        <button onclick="toggleChat()">Close</button>
-      </div>
-      <div class="chat-messages" id="chatMessages">
-        <!-- Messages will be added dynamically using JavaScript -->
-      </div>
-      <div class="chat-input">
-        <input type="text" placeholder="Type your message" id="messageInput">
-        <button >Send</button>
-      </div>
+.avatar {
+  margin-right: 10px; /* Thêm khoảng cách giữa avatar và tên */
+}
+
+.avatar img {
+  display: block;
+  width: 40px; /* Đặt chiều rộng cho avatar */
+  height: 40px; /* Đặt chiều cao cho avatar */
+  border-radius: 50%; /* Làm cho avatar trở nên tròn */
+}
+  
+  .menu-item.active,
+  .menu-item:hover {
+    background-color: #505050;
+  }
+  
+  .btn-new-event {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: #0b79f7;
+    color: white;
+    text-align: center;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .btn-new-event:hover {
+    background-color: #0966d2;
+  }
+  
+  .suggested-events {
+    margin-top: 20px;
+  }
+  
+  /* Additional styles for suggested events will go here */
+  
+  /* Add styles for responsiveness as needed */
+  
+      </style>
+  <div class="topics">
+  <div class="sidebar">
+    <form action="{%url 'chat'%}" method="GET">
+    <div class="search">
+      <input type="search" name ="q" placeholder="Tìm kiếm sự kiện">
+    </div>
+  </form>
+    <div class="menu">
+      <a href="{%url 'chat'%}" class="menu-item {% if request.resolver_match.url_name == 'chat' %}active{% endif %}">Trang chủ</a>
+      {%for f in accepted_friends%}
+      {% if friendship.sender == request.user %}
+      <a href="{%url 'open_chat' f.id%}" class="menu-item {% if request.resolver_match.url_name == 'open_chat' and request.resolver_match.kwargs.id|default_if_none:''|stringformat:'s' == friendship.receiver.id|stringformat:'s' %}active{% endif %}">
+        <div class="avatar avatar--small">
+          <img src="{{f.receiver.avatar.url}}" alt="cc"/>
+        </div>
+        {{f.receiver.name}}</a>
+      {%else%}
+      <a href="{%url 'open_chat' f.id%}" class="menu-item {% if request.resolver_match.url_name == 'open_chat' and request.resolver_match.kwargs.id|default_if_none:''|stringformat:'s' == friendship.sender.id|stringformat:'s' %}active{% endif %}">
+        <div class="avatar avatar--small">
+          <img src="{{f.sender.avatar.url}}" alt="cc"/>
+        </div>
+        {{f.sender.name}}</a>
+      {%endif%}
+      {%endfor%}
+    </div>
+    <div class="suggested-events">
+      <!-- Suggested events here -->
     </div>
   </div>
-
+  </div>
   <script>
-    function toggleChat() {
-      const chatInterface = document.getElementById('chatInterface');
-      chatInterface.style.display = chatInterface.style.display === 'none' ? 'flex' : 'none';
-    }
-
-    function openChat(friendName) {
-      const chatInterface = document.getElementById('chatInterface');
-      chatInterface.style.display = 'flex';
-      const chatTitle = document.getElementById('chatTitle');
-      chatTitle.textContent = `Chat with ${friendName}`;
-
-      // Fetch and display chat messages for the selected friend
-      fetch(`/get_chat_messages/${friendName}/`)
-        .then(response => response.json())
-        .then(messages => {
-          const chatMessages = document.getElementById('chatMessages');
-          chatMessages.innerHTML = ''; // Clear existing messages
-
-          messages.forEach(message => {
-            const newMessage = document.createElement('div');
-            newMessage.textContent = message.message;
-            newMessage.classList.add('chat-bubble', message.sender === '{{ request.user.username }}' ? 'sender' : 'receiver');
-            chatMessages.appendChild(newMessage);
+      // Khi một mục menu được nhấp, hãy thêm class 'active' vào nó và loại bỏ từ các mục khác
+      document.addEventListener('DOMContentLoaded', function() {
+        var menuItems = document.querySelectorAll('.menu-item');
+    
+        menuItems.forEach(function(item) {
+          item.addEventListener('click', function() {
+            // Xóa class 'active' khỏi tất cả các mục
+            menuItems.forEach(function(item) {
+              item.classList.remove('active');
+            });
+    
+            // Thêm class 'active' vào mục được nhấp
+            this.classList.add('active');
           });
         });
-    }
-
-
-
-    // Add logic to dynamically populate friends list and handle friend selection
-  </script>
-</body>
-</html>
+      });
+    </script>
+  

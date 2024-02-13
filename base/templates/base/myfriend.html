@@ -1,79 +1,106 @@
 <style>
 .layout {
-  display: flex;
-  justify-content: center;
-}
+    display: flex;
+    justify-content: center;
+  }
 
-.container_s {
-  max-width: 1200px; /* Chiều rộng tối đa của container */
-  margin: 0 auto; /* Căn giữa container */
-}
+  .container_s {
+    max-width: 1200px;
+    /* Chiều rộng tối đa của container */
+    margin: 0 auto;
+    /* Căn giữa container */
+  }
 
-.layout__box_s {
-  border-radius: 10px; /* Bo góc */
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Bóng đổ cho box */
-}
+  .layout__box_s {
+    border-radius: 10px;
+    /* Bo góc */
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    /* Bóng đổ cho box */
+  }
 
-.topics__grid_s {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between; /* Cách đều các item */
-  padding: 20px; /* Đệm xung quanh grid */
-}
+  .topics__grid_s {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    /* Cách đều các item */
+    padding: 20px;
+    /* Đệm xung quanh grid */
+  }
 
-.topics__item_s {
-  width: calc(33.333% - 30px); /* Chiếm 1/3 chiều rộng của container trừ đi khoảng cách */
-  margin-bottom: 15px; /* Khoảng cách giữa các hàng */
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Bóng đổ cho box */
+  .topics__item_s {
+    width: calc(33.333% - 30px);
+    /* Chiếm 1/3 chiều rộng của container trừ đi khoảng cách */
+    margin-bottom: 15px;
+    /* Khoảng cách giữa các hàng */
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    /* Bóng đổ cho box */
 
-}
+  }
 
-.friend-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-}
+  .friend-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
 
-.friend-avatar img {
-  border-radius: 50%;
-  width: 120px; /* Điều chỉnh kích thước avatar */
-  height: 120px;
-  margin-bottom: 10px; /* Khoảng cách từ avatar đến thông tin */
-}
+  .friend-avatar img {
+    border-radius: 50%;
+    width: 120px;
+    /* Điều chỉnh kích thước avatar */
+    height: 120px;
+    margin-bottom: 10px;
+    /* Khoảng cách từ avatar đến thông tin */
+  }
 
-.friend-info_s {
-  text-align: center;
-  padding: 10px 0;
-}
+  .friend-info_s {
+    text-align: center;
+    padding: 10px 0;
 
-.friend-name_s {
-  font-size: 10px; /* Kích thước chữ cho tên */
-  color: #333;
-  margin-bottom: 5px; /* Khoảng cách từ tên đến nút */
-}
+  }
 
-.friend-actions_s {
-  display: flex;
-  flex-direction: column; /* Các nút xếp chồng lên nhau theo chiều dọc */
-  width: 100%; /* Các nút chiếm toàn bộ chiều rộng */
-}
+  .friend-name_s {
+    font-size: 1.9rem;
+    /* Kích thước chữ cho tên */
+    color: #333;
+    margin-bottom: 5px;
+    /* Khoảng cách từ tên đến nút */
+    color: #b2bdbd;
+  }
 
-.btn--primary {
-  border: none;
-  border-radius: 4px;
-  padding: 8px 0; /* Đệm cho nút */
-  margin-bottom: 8px; /* Khoảng cách giữa các nút */
-  color: white;
-  text-transform: uppercase; /* Viết hoa chữ trên nút */
-  font-weight: bold;
-  cursor: pointer;
-  width: 100px;
-}
+  .friend-actions_s {
+    display: flex;
+    flex-direction: column;
+    /* Các nút xếp chồng lên nhau theo chiều dọc */
+    width: 100%;
+    /* Các nút chiếm toàn bộ chiều rộng */
 
-.btn--primary:hover {
-  background-color: #0056b3; /* Màu nền khi hover cho nút */
-}
+  }
+
+  .btn--primary {
+    border: none;
+    border-radius: 4px;
+    padding: 8px 0;
+    /* Đệm cho nút */
+    margin-bottom: 8px;
+    /* Khoảng cách giữa các nút */
+    color: white;
+    text-transform: uppercase;
+    /* Viết hoa chữ trên nút */
+    font-weight: bold;
+    cursor: pointer;
+
+  }
+
+  .btn--primary:hover {
+    background-color: #0056b3;
+    /* Màu nền khi hover cho nút */
+
+  }
+
+  .topics__item_s:hover {
+    transform: translateY(-5px);
+  }
   </style>
   
   {% extends 'main.html' %}
@@ -119,7 +146,7 @@
                       <img src="{{ u.receiver.avatar.url }}" alt="{{ u.name }} Avatar"  />
                     </div>
                     <div class="friend-info_s">
-                      <span class="friend-name">{{ u.receiver.name }}</span>
+                      <span class="friend-name_s">{{ u.receiver.name }}</span>
                       
                       <div class="friend-actions_s" >
                         <a href="{% url 'reject' u.receiver.id%}" >
@@ -135,14 +162,14 @@
                 </a>
                 {%else%}
                 <a href="{% url 'profile' u.sender.id%}">
-                  <div class="friend-item_s">
-                    <div class="friend-avatar_s">
+                  <div class="friend-item">
+                    <div class="friend-avatar">
                       <img src="{{ u.sender.avatar.url }}" alt="{{ u.name }} Avatar"  />
                     </div>
-                    <div class="friend-info_s">
+                    <div class="friend-info">
                       <span class="friend-name">{{ u.sender.name }}</span>
                       
-                      <div class="friend-actions_s" >
+                      <div class="friend-actions" >
                         <a href="{% url 'reject' u.receiver.id%}" >
                         <button class="btn btn--primary" style="background-color: #99CCFF; ">Remove</button>
                       </a>

@@ -1,18 +1,22 @@
 <style>
   
+
 </style>
   <div class="activities__content" id="requestList" style="display: none;">
     <!-- Danh sách bạn bè sẽ được hiển thị ở đây -->
     {% for u in sent %}
-    <div class="activities__box" style="margin-top: 5px;">
-      <div class="friend-item">
-        <div class="friend-request-item">
-          <div class="friend-request-avatar">
-            <div class=" friend-avatar">
+    <div class="activities__box-re" style="margin-top: 5px;">
+      <div class="friend-item-re">
+        <div class="friend-request-item-re">
+          <div class="friend-request-avatar-re">
+            <div class=" friend-avatar-re">
               
-              <a href="{% url 'profile' u.sender.id%}"> <img src="{{ u.sender.avatar.url }}" alt="{{ u.name }} Avatar"/><span class="friend-name">{{ u.sender.name }}</span> </a>
+              <a href="{% url 'profile' u.sender.id%}"> <img src="{{ u.sender.avatar.url }}" alt="{{ u.name }} Avatar"/> </a>
             </div>
-          <div class="friend-request-actions">
+            <div class="friend-name">
+              <span class="friend-name">{{ u.sender.name }}</span>
+            </div>
+          <div class="friend-request-actions-re">
             <a href="{% url 'accept' u.sender.id%}"><button class="btn btn--accept" style="background-color: #99CCFF;">Accept</button></a>
             <a href="{% url 'reject' u.sender.id%}"><button class="btn btn--reject" style="background-color: #99CCFF;">Remove</button></a>
           </div>
